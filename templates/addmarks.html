@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 {% extends "base.html" %}
 {% block head %}<title>Add Marks</title>{% endblock %}
 {% block body %}
@@ -21,3 +22,28 @@
     </form>
 </div>
 {% endblock %}
+=======
+{% extends "base.html" %}
+{% block head %}<title>Add Marks</title>{% endblock %}
+{% block body %}
+<div class="container">
+    <form method="POST">
+        <div class="tab">
+            <p>subject</p>
+            <select id="subject", name="subject" required>
+                <option value="">Select Subject</option>
+                <option value="2">Maths</option>
+                <option value="1">Science</option>
+                <option value="3">Telugu</option>
+                <option value="4">Hindi</option>
+            </select>
+        </div>
+        <div class="tab">
+            <p>marks</p>
+            <input type="number" id="marks" name="marks" min='0' max='100' required>
+        </div>
+        <button type="submit">Add marks</button>
+    </form>
+</div>
+{% endblock %}
+>>>>>>> 192c9775f552fd7645e842edfb371c0ae508b5cc

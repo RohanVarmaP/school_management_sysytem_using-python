@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -33,4 +34,41 @@
     </div>
     {% block body %}{% endblock %}
 </body>
+=======
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{url_for('static',filename='css/main.css')}}">
+    {% block title %}{% endblock %}
+</head>
+<body>
+    <div class="navbar">
+        <div class="left">
+            {% if session.get('role')==3 %}
+                <a href="{{ url_for('students') }}">Student Page</a>
+            {% elif session.get('role')==2 %}
+                <a href="{{ url_for('home') }}">Home</a>
+            {% else %}
+                <a href="{{ url_for('dashboard') }}">Dashboard</a>
+                <a href="{{ url_for('home') }}">Home</a>
+            {% endif %}
+        </div>
+        <div class="right">
+            {% if session.get('logged_in') %}
+                <div class="dropdown">
+                    <button class="dropbtn">{{ session.get('username') }}</button>
+                    <div class="dropdown-content">
+                        <a href="{{ url_for('logout') }}">Logout</a>
+                    </div>
+                </div>
+            {% else %}
+                <a href="{{ url_for('login') }}">Login</a>
+            {% endif %}
+        </div>
+    </div>
+    {% block body %}{% endblock %}
+</body>
+>>>>>>> 192c9775f552fd7645e842edfb371c0ae508b5cc
 </html>

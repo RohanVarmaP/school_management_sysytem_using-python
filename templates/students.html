@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 {% extends "base.html" %}
 {% block head %}<title>student_info</title>{% endblock %}
 {% block body %}
@@ -52,4 +53,62 @@
             </table> 
         {% endif %}
     </div>
+=======
+{% extends "base.html" %}
+{% block head %}<title>student_info</title>{% endblock %}
+{% block body %}
+    <div class="container">
+        <div class="page_top">
+            {% if session.get('role')==2 %}<a href="{{url_for('addmarks',rollno=students[0]['roll_no'])}}" class="add"><button >Add marks</button></a>{% endif %}
+            <h1 class="page-title">Student Information</h1>
+        </div>
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                {% for message in messages %}
+                    <div>{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        
+        <table class="table">
+            <tr>
+                <th class="first">ROLL.NO</th>
+                <th>Name</th>
+                <th>Username</th>
+                <th>Class</th>
+                <th>Age</th>
+                <th>Fee Details</th>
+                <th class="last">Gender</th>
+            </tr>
+            <tr>
+                <td>{{students[0]['roll_no']}}</td>
+                <td>{{students[0]['s_name']}}</td>
+                <td>{{students[0]['username']}}</td>
+                <td>{{students[0]['class']}}</td>
+                <td>{{students[0]['s_age']}}</td>
+                <td>{{students[0]['fee']}}</td>
+                <td>{{students[0]['gender']}}</td>
+            </tr>
+        </table> 
+        {% if students[0]['sub_name'] is none %}
+
+        {% else %}
+            <table class="table2">
+                <tr>
+                    <th class="first">subject</th>
+                    <th>Marks</th>
+                    <th class="last">Grade</th>
+                </tr>
+                {% for student in students %}
+                    <tr>
+                        <td>{{student['sub_name']}}</td>
+                        <td>{{student['marks']}}</td>
+                        <td>{{student['grade']}}</td>
+                    </tr>
+                {% endfor %}
+            </table> 
+        {% endif %}
+    </div>
+>>>>>>> 192c9775f552fd7645e842edfb371c0ae508b5cc
 {% endblock %}
