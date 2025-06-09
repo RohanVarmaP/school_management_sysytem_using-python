@@ -199,33 +199,35 @@ class students(Resource):
                 # print(data)
                 return {"info":data,"message":"ok"}
             elif role_no==1:
-                results=db.session.query(Studentinfo, Marksinfo, Subinfo).outerjoin(Marksinfo, Studentinfo.roll_no == Marksinfo.roll_no).outerjoin(Subinfo, Marksinfo.sub_no == Subinfo.sub_no).filter(Studentinfo.roll_no == roll_no).all()
-                # print(results)
-                # print(results[0][0].roll_no)
-                if not results:
-                    return {"message":"Student not found. Try again"},404
-                data={
-                    'student':{
-                            'roll_no': results[0][0].roll_no,
-                            's_name': results[0][0].s_name,
-                            's_class': results[0][0].s_class,
-                            'age': results[0][0].s_age,
-                            'fee': results[0][0].fee,
-                            'gender': results[0][0].gender
-                        },
-                    'marks':[]
-                }
-                print(results)
-                for student,marks,subject in results:
-                    if not marks:
-                        break
-                    data['marks'].append({
-                        'subject':subject.sub_name,
-                        'marks':marks.marks,
-                        "grade":marks.grade
-                    })
-                print(data)
-                return {"info":data,"message":"ok"}
+                print("hellooooooooooooooooooooooooooooooooooooooooooooo")
+                try:
+                    results=db.session.query(Studentinfo, Marksinfo, Subinfo).outerjoin(Marksinfo, Studentinfo.roll_no == Marksinfo.roll_no).outerjoin(Subinfo, Marksinfo.sub_no == Subinfo.sub_no).filter(Studentinfo.roll_no == roll_no).all()
+                    print("hellooooooooooooooooooooooooooooooooooooooooooooo",results)
+                    print(results[0][0].roll_no)
+                    data={
+                        'student':{
+                                'roll_no': results[0][0].roll_no,
+                                's_name': results[0][0].s_name,
+                                's_class': results[0][0].s_class,
+                                'age': results[0][0].s_age,
+                                'fee': results[0][0].fee,
+                                'gender': results[0][0].gender
+                            },
+                        'marks':[]
+                    }
+                    print(results)
+                    for student,marks,subject in results:
+                        if not marks:
+                            break
+                        data['marks'].append({
+                            'subject':subject.sub_name,
+                            'marks':marks.marks,
+                            "grade":marks.grade
+                        })
+                    print(data)
+                    return {"info":data,"message":"ok"}
+                except Exception as e:
+                    return {"message": f"An error occurred: {e}"}, 500
             else:
                 return {"message":"You don't have access to this page"},401
         else:
@@ -468,15 +470,22 @@ class editstudent(Resource):
             return {"message":"Data is not valid."},502
         try:
             student=Studentinfo.query.filter_by(roll_no=roll_no).first()
+            print(data)
             if data.get('name'):
+                print("name")
                 student.s_name=data.get('name')
             if data.get('class'):
+                print("class")
                 student.s_class=data.get('class')
             if data.get('age'):
+                print("age")
+                print(data.get('age'))
                 student.s_age=data.get('age')
             if data.get('fee_details'):
+                print("fee")
                 student.fee=data.get('fee_details')
             if data.get('gender'):
+                print("gender")
                 student.gender=data.get('gender')
             db.session.commit()
             return {'message':"student updated"}

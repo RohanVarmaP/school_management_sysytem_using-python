@@ -26,9 +26,14 @@
                 <tr>
                     <td>{{student['roll_no']}}</td>
                     <td>{{student['s_name']}}</td>
-                    <td><a href="{{url_for('students', roll_no=student['roll_no'])}}"><button >View</button></a>
-                        <div>
-                        {% if session.get('role')==1 %}<a href="{{url_for('deletestudent',roll_no=student['roll_no'])}}"><button >Delete</button></a>{% endif %}
+                    <td>
+                        <div class="action-buttons">
+                            <a href="{{url_for('students', roll_no=student['roll_no'])}}"><button>View</button></a>
+                            {% if session.get('role')==1 %}
+                                <a href="{{url_for('editstudent', roll_no=student['roll_no'])}}"><button>Edit</button></a>
+                                <a href="{{url_for('deletestudent', roll_no=student['roll_no'])}}"><button>Delete</button></a>
+                            {% endif %}
+                        </div>
                     </td>
                 </tr>
             {% endfor %}

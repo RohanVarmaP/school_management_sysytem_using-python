@@ -135,6 +135,8 @@ def students(roll_no=None):
                 return redirect(url_for('students'))
     else:
         if roll_no:
+            print("not student with roll_NO                    cvbnjkytrdcvbnkuytfdcvbnkuytrd")
+            print(session.get('role'),session.get('t_no'),roll_no)
             res = requests.get(f"http://localhost:5000/api/students/{session.get('role')}/{session.get('t_no')}/{roll_no}")
             if res.status_code==200:
                 print("with rollno not student                       ",res.json().get('info'))
@@ -249,6 +251,31 @@ def addteacher():
             flash(res.json().get('message'))
             return redirect(url_for('home'))
         return render_template("addteacher.html")
+
+@app.route('/editstudent/<int:roll_no>',methods=["POST","GET","PUT"])
+@checklogin
+@check_admin
+def editstudent(roll_no):
+    if request.method=="POST":
+        name=request.form.get('name')
+        age=request.form.get('age')
+        classes=request.form.get('class')
+        fee=request.form.get('fee')
+        gender=request.form.get('gender')
+        data={
+            "name": name,
+            "class": classes,
+            "age": age,
+            "fee_details": fee,
+            "gender": gender
+        }
+        res=requests.put(f"http://localhost:5000/api/editstudent/{session.get('role')}/{roll_no}/",json=data)
+        if res.status_code!=200:
+            flash(res.json().get('message'))
+            return redirect(url_for('home'))
+        flash(res.json().get('message'))
+        return redirect(url_for('home'))
+    return render_template("editstudent.html")
 
 @app.route('/deletestudent/<int:roll_no>')
 @checklogin
