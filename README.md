@@ -159,5 +159,4 @@ For questions, feedback, or support, please reach out to:
 
 ---
 
-Would you like me to help generate the `requirements.txt` file or example SQL schema next?
 
