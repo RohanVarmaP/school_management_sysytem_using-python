@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% block head %}<title>home</title>{% endblock %}
+{% block body %}
+    <div class="container">
+            <!-- Flash Messages -->
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                    {% for message in messages %}
+                        <div>{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+        <div class="page_top">
+            {% if session.get('role')==1 %}<a href="{{url_for('addstudent')}}" class="add"><button >Add Student</button></a>{% endif %}
+            {% if session.get('role')==1 %}<a href="{{url_for('addteacher')}}" class="add"><button >Add teacher</button></a>{% endif %}
+            <h1 class="page-title">Home</h1>
+        </div>
+        <p>Welcome to the home page!</p>
+        <table class="table">
+            <tr>
+                <th class="first">ROLL.NO</th>
+                <th>First name</th>
+                <th class="last">View/Delete</th>
+            </tr>
+            {% for student in students %}
+                <tr>
+                    <td>{{student['roll_no']}}</td>
+                    <td>{{student['s_name']}}</td>
+                    <td><a href="{{url_for('students', roll_no=student['roll_no'])}}"><button >View</button></a>
+                        <div>
+                        {% if session.get('role')==1 %}<a href="{{url_for('deletestudent',roll_no=student['roll_no'])}}"><button >Delete</button></a>{% endif %}
+                    </td>
+                </tr>
+            {% endfor %}
+        </table> 
+        {% if session.get('role')==1 %}
+            <table class="table">
+                <tr>
+                    <th class="first">Teacher.NO</th>
+                    <th>Name</th>
+                    <th class="last">Class</th>
+                </tr>
+                {% for teacher in teachers %}
+                    {%if teacher['name']!='admin'%}
+                        <tr>
+                            <td>{{teacher['teacher_no']}}</td>
+                            <td>{{teacher['name']}}</td>
+                            <td>{{teacher['class']}}</td>
+                        </tr>
+                    {% endif %}
+                {% endfor %}
+            </table>
+        {% elif session.get('role')==2 %}
+            <table class="table">
+                <tr>
+                    <th class="first">Teacher.NO</th>
+                    <th>Name</th>
+                    <th class="last">Class</th>
+                </tr>
+                <tr>
+                    <td>{{teachers['teacher_no']}}</td>
+                    <td>{{teachers['name']}}</td>
+                    <td>{{teachers['class']}}</td>
+                </tr>
+            </table>
+        {% endif %}
+    </div>     
+{% endblock %}

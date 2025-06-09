@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block head %}<title>student_info</title>{% endblock %}
+{% block body %}
+    <div class="container">
+        <div class="page_top">
+            {% if session.get('role')==2 %}<a href="{{url_for('addmarks',roll_no=students['student']['roll_no'])}}" class="add"><button >Add marks</button></a>{% endif %}
+            <h1 class="page-title">Student Information</h1>
+        </div>
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                {% for message in messages %}
+                    <div>{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        
+        <table class="table">
+            <tr>
+                <th class="first">ROLL.NO</th>
+                <th>Name</th>
+                <th>Class</th>
+                <th>Age</th>
+                <th>Fee Details</th>
+                <th class="last">Gender</th>
+            </tr>
+            <tr>
+                <td>{{students['student']['roll_no']}}</td>
+                <td>{{students['student']['s_name']}}</td>
+                <td>{{students['student']['s_class']}}</td>
+                <td>{{students['student']['age']}}</td>
+                <td>{{students['student']['fee']}}</td>
+                <td>{{students['student']['gender']}}</td>
+            </tr>
+        </table> 
+        {% if students[marks] is none %}
+
+        {% else %}
+            <table class="table2">
+                <tr>
+                    <th class="first">subject</th>
+                    <th>Marks</th>
+                    <th class="last">Grade</th>
+                </tr>
+                {% for mark in students['marks'] %}
+                    <tr>
+                        <td>{{mark['subject']}}</td>
+                        <td>{{mark['marks']}}</td>
+                        <td>{{mark['grade']}}</td>
+                    </tr>
+                {% endfor %}
+            </table> 
+        {% endif %}
+    </div>
+{% endblock %}

@@ -1,0 +1,172 @@
+{
+    "info": {
+        "_postman_id": "a342f2c1-f847-4569-af5e-b457c2b2ba1f",
+        "name": "student_page_using_api_orm",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+        "description": ""
+    },
+    "item": [
+        {
+            "name": "login",
+            "request": {
+                "method": "POST",
+                "url": {
+                    "raw": "http://127.0.0.1:5000/api/login",
+                    "path": [
+                        "api",
+                        "login"
+                    ],
+                    "protocol": "http",
+                    "host": [
+                        "127",
+                        "0",
+                        "0",
+                        "1"
+                    ],
+                    "port": "5000"
+                },
+                "body": {
+                    "mode": "raw",
+                    "options": {
+                        "raw": {
+                            "language": "json"
+                        }
+                    },
+                    "raw": "{\n  \"username\":\"admin@admin.com\",\n  \"password\":\"admin@r123\"\n}"
+                }
+            }
+        },
+        {
+            "name": "logout",
+            "request": {
+                "method": "POST",
+                "url": {
+                    "raw": "http://127.0.0.1:5000/api/logout",
+                    "path": [
+                        "api",
+                        "logout"
+                    ],
+                    "protocol": "http",
+                    "host": [
+                        "127",
+                        "0",
+                        "0",
+                        "1"
+                    ],
+                    "port": "5000"
+                }
+            }
+        },
+        {
+            "name": "students",
+            "request": {
+                "method": "GET",
+                "url": {
+                    "raw": "http://127.0.0.1:5000/api/students/",
+                    "path": [
+                        "api",
+                        "students"
+                    ],
+                    "protocol": "http",
+                    "host": [
+                        "127",
+                        "0",
+                        "0",
+                        "1"
+                    ],
+                    "port": "5000"
+                },
+                "body": {
+                    "mode": "raw",
+                    "options": {
+                        "raw": {
+                            "language": "json"
+                        }
+                    },
+                    "raw": "{\n  \"username\":\"admin@admin.com\",\n  \"password\":\"admin@r123\"\n}"
+                }
+            }
+        },
+        {
+            "name": "teachers",
+            "request": {
+                "method": "GET",
+                "url": {
+                    "raw": "http://127.0.0.1:5000/api/teachers/",
+                    "path": [
+                        "api",
+                        "teachers"
+                    ],
+                    "protocol": "http",
+                    "host": [
+                        "127",
+                        "0",
+                        "0",
+                        "1"
+                    ],
+                    "port": "5000"
+                }
+            }
+        },
+        {
+            "name": "addteacher",
+            "request": {
+                "method": "POST",
+                "url": {
+                    "raw": "http://127.0.0.1:5000/api/adduser",
+                    "path": [
+                        "api",
+                        "adduser"
+                    ],
+                    "protocol": "http",
+                    "host": [
+                        "127",
+                        "0",
+                        "0",
+                        "1"
+                    ],
+                    "port": "5000"
+                },
+                "body": {
+                    "mode": "raw",
+                    "options": {
+                        "raw": {
+                            "language": "json"
+                        }
+                    },
+                    "raw": " {\n   \"role\":2,\n  \"username\":\"ramesh@teacher.com\",\n  \"password\":\"ramesh@r123\",\n  \"teacher_name\":\"Ramesh\",\n  \"class\":\"10A\"\n} "
+                }
+            }
+        },
+        {
+            "name": "addstudent",
+            "request": {
+                "method": "POST",
+                "url": {
+                    "raw": "http://127.0.0.1:5000/api/adduser",
+                    "path": [
+                        "api",
+                        "adduser"
+                    ],
+                    "protocol": "http",
+                    "host": [
+                        "127",
+                        "0",
+                        "0",
+                        "1"
+                    ],
+                    "port": "5000"
+                },
+                "body": {
+                    "mode": "raw",
+                    "options": {
+                        "raw": {
+                            "language": "json"
+                        }
+                    },
+                    "raw": "{\r\n  \"role\":3,\r\n  \"username\":\"john@student.com\",\r\n  \"password\":\"john@r123\",\r\n  \"name\": \"John\",\r\n  \"class\": \"10A\",\r\n  \"age\": 15,\r\n  \"fee_details\": 5000,\r\n  \"gender\": \"Male\"\r\n}\r\n"
+                }
+            }
+        }
+    ]
+}
