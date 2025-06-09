@@ -7,7 +7,7 @@
     {% block title %}{% endblock %}
 </head>
 <body>
-    {% if session.get('logged_in') %}
+    {% if session.get('logged_in')==True %}
         <div class="navbar">
             <div class="left">
                 {% if session.get('role')==3 %}
