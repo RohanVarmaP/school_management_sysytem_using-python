@@ -277,6 +277,25 @@ def editstudent(roll_no):
         return redirect(url_for('home'))
     return render_template("editstudent.html")
 
+@app.route('/editmarks/<int:roll_no>/',methods=["POST","GET"])
+@checklogin
+@check_teacher
+def editmarks(roll_no):
+    if request.method=="POST":
+        data={
+            "sub_no": request.form["subject"],
+            "marks" : int(request.form["marks"])
+        }
+        print("adding teacher!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!",data)
+        res = requests.put(f"http://localhost:5000/api/editmarks/{session.get('role')}/{session.get('t_no')}/{roll_no}/",json=data)
+        if res.status_code!=200:
+            flash(res.json().get('message'))
+            return redirect(url_for('students'))
+        flash(res.json().get('message'))
+        return redirect(url_for('students'))
+    return render_template("editmarks.html")
+
+
 @app.route('/deletestudent/<int:roll_no>')
 @checklogin
 @check_admin

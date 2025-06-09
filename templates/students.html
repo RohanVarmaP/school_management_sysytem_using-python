@@ -41,12 +41,18 @@
                     <th class="first">subject</th>
                     <th>Marks</th>
                     <th class="last">Grade</th>
+                    {% if session.get('role')==2 %}
+                            <th>Edit</th>
+                        {% endif %}
                 </tr>
                 {% for mark in students['marks'] %}
                     <tr>
                         <td>{{mark['subject']}}</td>
                         <td>{{mark['marks']}}</td>
                         <td>{{mark['grade']}}</td>
+                        {% if session.get('role')==2 %}
+                            <td><a href="{{url_for('editmarks', roll_no=students['student']['roll_no'])}}"><button>Edit</button></a></td>
+                        {% endif %}
                     </tr>
                 {% endfor %}
             </table> 

@@ -494,14 +494,14 @@ class editstudent(Resource):
 
 class editmarks(Resource):
     # @checklogin
-    def put(self,role_no,auth_no,roll_no,sub_no):
+    def put(self,role_no,auth_no,roll_no):
         if role_no!=2:
             return {"message":"You are Unauthorized, only admin can perform this task."},401
         data=request.get_json()
         if not data:
             return {"message":"Data is not valid."},502
         try:
-            mark=Marksinfo.query.join(Studentinfo, Studentinfo.roll_no==Marksinfo.roll_no).join(Subinfo,Subinfo.sub_no==Marksinfo.sub_no).join(Teacherinfo,Teacherinfo.t_class==Studentinfo.s_class).filter(Studentinfo.roll_no==roll_no,Teacherinfo.t_no==auth_no,Subinfo.sub_no==sub_no).first()
+            mark=Marksinfo.query.join(Studentinfo, Studentinfo.roll_no==Marksinfo.roll_no).join(Subinfo,Subinfo.sub_no==Marksinfo.sub_no).join(Teacherinfo,Teacherinfo.t_class==Studentinfo.s_class).filter(Studentinfo.roll_no==roll_no,Teacherinfo.t_no==auth_no,Subinfo.sub_no==data.get('sub_no')).first()
             print(mark)
             if data.get('sub_no'):
                 mark.sub_no=data.get('sub_no')
@@ -572,7 +572,7 @@ api.add_resource(adduser,'/api/adduser/<int:role_no>/',endpoint='adduser_resourc
 api.add_resource(addmarks,'/api/addmarks/<int:role_no>/<int:auth_no>/',endpoint="addmarks_resource")
 api.add_resource(deletestudent,"/api/deletestudent/<int:role_no>/<int:roll_no>/",endpoint="deletestudent_resource")
 api.add_resource(editstudent,'/api/editstudent/<int:role_no>/<int:roll_no>/',endpoint='editstudent_resource')
-api.add_resource(editmarks,'/api/editmarks/<int:role_no>/<int:auth_no>/<int:roll_no>/<int:sub_no>',endpoint='editmarks_resource')
+api.add_resource(editmarks,'/api/editmarks/<int:role_no>/<int:auth_no>/<int:roll_no>/',endpoint='editmarks_resource')
 api.add_resource(dashboard,'/api/dashboard/<int:role_no>/',endpoint="dashboard_resource")
 
 
