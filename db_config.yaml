@@ -1,7 +1,0 @@
-database:
-  host: localhost
-  user: root
-  password: #your_password
-  database: #your_database
-
-secret_key: "my_secret_key_here"
