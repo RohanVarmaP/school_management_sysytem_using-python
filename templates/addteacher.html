@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block head %}
+<title>Add Student</title>
+{% endblock %}
+{% block body %}
+<div class="container">
+    <form method="POST">
+        <div class="tab">
+            <p>Name</p>
+            <input type="text" id="name" name="name" required>
+        </div>
+        <div class="tab">
+            <p>Class</p>
+            <input type="text" id="class" name="class" required>
+        </div>
+        <div class="tab">
+            <p>Username</p>
+            <input type="email" id="username" name="username" required>
+        </div>
+        <div class="tab">
+            <p>password</p>
+            <input type="password" id="password" name="password" required>
+        </div>
+        <button type="submit">Save</button>
+    </form>
+</div>
+{% endblock %}
