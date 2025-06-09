@@ -4,6 +4,8 @@ from flask import Flask, redirect, request, session, url_for
 from flask_sqlalchemy import SQLAlchemy
 from flask_restful import Resource,Api
 from sqlalchemy.orm import foreign
+from sqlalchemy import Column, Integer, String, ForeignKey, UniqueConstraint, func
+
 
 app=Flask(__name__)
 app.secret_key="secret_key"
@@ -86,7 +88,11 @@ class Marksinfo(db.Model):
     sub_no=db.Column(db.Integer,db.ForeignKey('sub_info.sub_no',ondelete="CASCADE"))
     marks=db.Column(db.Integer)
     grade=db.Column(db.String(100))
-    
+
+    __table_args__ = (
+        UniqueConstraint('roll_no', 'sub_no', name='uix_rollno_subno'),
+    )
+
     student=db.relationship('Studentinfo',backref=db.backref('marks',cascade='all, delete'))
     subject=db.relationship('Subinfo',backref=db.backref('marks',cascade="all, delete"))
 
@@ -434,8 +440,8 @@ class addmarks(Resource):
                 db.session.add(new_marks)
                 db.session.commit()
                 return {"message":"Marks successfully added"}
-            except Exception:
-                return {"message":"Your input is not clean"},502
+            except Exception as e:
+                return {"message": f"An error occurred: {e}"}, 500
         else:
             return {"message":"You(Admin) are Unauthorized to do to the task"},401
 
@@ -444,10 +450,13 @@ class deletestudent(Resource):
     def delete(self,role_no,roll_no):
         if role_no!=1:
             return {"message":"You are Unauthorized, only admin can perform this task."},401
-        user=Userinfo.query.join(Studentinfo).filter(Studentinfo.roll_no==roll_no).first()
-        db.session.delete(user)
-        db.session.commit()
-        return {"message":"Student successfully deleted."}
+        try:
+            user=Userinfo.query.join(Studentinfo).filter(Studentinfo.roll_no==roll_no).first()
+            db.session.delete(user)
+            db.session.commit()
+            return {"message":"Student successfully deleted."}
+        except Exception as e:
+            return {"message": f"An error occurred: {e}"}, 500
 
 class editstudent(Resource):
     # @checklogin
@@ -457,8 +466,8 @@ class editstudent(Resource):
         data=request.get_json()
         if not data:
             return {"message":"Data is not valid."},502
-        student=Studentinfo.query.filter_by(roll_no=roll_no).first()
-        if student:
+        try:
+            student=Studentinfo.query.filter_by(roll_no=roll_no).first()
             if data.get('name'):
                 student.s_name=data.get('name')
             if data.get('class'):
@@ -471,8 +480,8 @@ class editstudent(Resource):
                 student.gender=data.get('gender')
             db.session.commit()
             return {'message':"student updated"}
-        else:
-            return {"message":"Student not found."},404
+        except Exception as e:
+            return {"message": f"An error occurred: {e}"}, 500
 
 class editmarks(Resource):
     # @checklogin
@@ -482,8 +491,8 @@ class editmarks(Resource):
         data=request.get_json()
         if not data:
             return {"message":"Data is not valid."},502
-        mark=Marksinfo.query.join(Studentinfo, Studentinfo.roll_no==Marksinfo.roll_no).join(Subinfo,Subinfo.sub_no==Marksinfo.sub_no).join(Teacherinfo,Teacherinfo.t_class==Studentinfo.s_class).filter(Studentinfo.roll_no==roll_no,Teacherinfo.t_no==auth_no,Subinfo.sub_no==sub_no).first()
-        if mark:
+        try:
+            mark=Marksinfo.query.join(Studentinfo, Studentinfo.roll_no==Marksinfo.roll_no).join(Subinfo,Subinfo.sub_no==Marksinfo.sub_no).join(Teacherinfo,Teacherinfo.t_class==Studentinfo.s_class).filter(Studentinfo.roll_no==roll_no,Teacherinfo.t_no==auth_no,Subinfo.sub_no==sub_no).first()
             print(mark)
             if data.get('sub_no'):
                 mark.sub_no=data.get('sub_no')
@@ -499,8 +508,51 @@ class editmarks(Resource):
             db.session.commit()
             print(mark)
             return {'message':"student updated"}
-        else:
-            return {"message":"Student or subject not found."},404
+        except Exception as e:
+            return {"message": f"An error occurred: {e}"}, 500
+
+class dashboard(Resource):
+    # @checklogin
+    def get(self,role_no):
+        if role_no!=1:
+            return {"message":"You are Unauthorized, only admin can perform this task."},401
+        try:
+            total = db.session.query(func.count(Studentinfo.roll_no)).scalar()
+            gender = dict(db.session.query(Studentinfo.gender, func.count()).group_by(Studentinfo.gender).all())
+            fee = dict(db.session.query(Studentinfo.fee, func.count()).group_by(Studentinfo.fee).all())
+            avgmarks_raw = dict(db.session.query(Subinfo.sub_name, func.avg(Marksinfo.marks)).join(Marksinfo, Marksinfo.sub_no == Subinfo.sub_no).group_by(Subinfo.sub_name).all())
+            stuinclass = dict(db.session.query(Studentinfo.s_class, func.count()).group_by(Studentinfo.s_class).all())
+            male = dict(db.session.query(Studentinfo.s_class, func.count()).filter(Studentinfo.gender == 'male').group_by(Studentinfo.s_class).all())
+            female = dict(db.session.query(Studentinfo.s_class, func.count()).filter(Studentinfo.gender == 'female').group_by(Studentinfo.s_class).all())
+            print(total)
+            print()
+            print(gender)
+            print()
+            print(fee)
+            print()
+            print(avgmarks_raw)
+            print()
+            print(stuinclass)
+            print()
+            print(male)
+            print()
+            print(female)
+            for x,y in avgmarks_raw.items():
+                print(x,"->",y)
+            avgmarks = {x: float(y) if y is not None else None for x,y in avgmarks_raw.items()}
+            data={
+                "total":total,
+                "gender":gender,
+                "fee":fee,
+                "avg":avgmarks,
+                "stu":stuinclass,
+                "male":male,
+                "female":female
+            }
+            return {"info":data,"message":"ok"}
+        except Exception as e:
+            return {"message": f"An error occurred: {e}"}, 500
+        
 
 #api
 api.add_resource(login,'/api/login/')
@@ -512,7 +564,7 @@ api.add_resource(addmarks,'/api/addmarks/<int:role_no>/<int:auth_no>/',endpoint=
 api.add_resource(deletestudent,"/api/deletestudent/<int:role_no>/<int:roll_no>/",endpoint="deletestudent_resource")
 api.add_resource(editstudent,'/api/editstudent/<int:role_no>/<int:roll_no>/',endpoint='editstudent_resource')
 api.add_resource(editmarks,'/api/editmarks/<int:role_no>/<int:auth_no>/<int:roll_no>/<int:sub_no>',endpoint='editmarks_resource')
-
+api.add_resource(dashboard,'/api/dashboard/<int:role_no>/',endpoint="dashboard_resource")
 
 
 if __name__=="__main__":

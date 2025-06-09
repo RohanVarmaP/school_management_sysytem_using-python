@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 {% extends "base.html" %}
 {% block head %}
 <title>Add Student</title>
@@ -55,58 +54,3 @@
     </form>
 </div>
 {% endblock %}
-=======
-{% extends "base.html" %}
-{% block head %}
-<title>Add Student</title>
-{% endblock %}
-{% block body %}
-<div class="container">
-    <form method="POST">
-        <div class="tab">
-            <p>Name</p>
-            <input type="text" id="name" name="name" required>
-        </div>
-        <div class="tab">
-            <p>Class</p>
-            <select id="class" name="class" required>
-                <option value="">Select class</option>
-                <option value="11A">11A</option>
-                <option value="11B">11B</option>
-                <option value="12A">12A</option>
-                <option value="12B">12B</option>
-            </select>
-        </div>
-        <div class="tab">
-            <p>Age</p>
-            <input type="number" id="age" name="age" required>
-        </div>
-        <div class="tab">
-            <p>Fee Details</p>
-            <select id="fee" name="fee" required>
-                <option value="">Select Option</option>
-                <option value="Paid">Paid</option>
-                <option value="Unpaid">Unpaid</option>
-            </select>
-        </div>
-        <div class="tab">
-            <p>Gender</p>
-            <select id="gender" name="gender" required>
-                <option value="">Select Gender</option>
-                <option value="Male">Male</option>
-                <option value="Female">Female</option>
-            </select>
-        </div>
-        <div class="tab">
-            <p>Username</p>
-            <input type="email" id="username" name="username" required>
-        </div>
-        <div class="tab">
-            <p>password</p>
-            <input type="password" id="password" name="password" required>
-        </div>
-        <button type="submit">Save</button>
-    </form>
-</div>
-{% endblock %}
->>>>>>> 192c9775f552fd7645e842edfb371c0ae508b5cc

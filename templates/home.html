@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 {% extends "base.html" %}
 {% block head %}<title>home</title>{% endblock %}
 {% block body %}
@@ -66,75 +65,4 @@
             </table>
         {% endif %}
     </div>     
-=======
-{% extends "base.html" %}
-{% block head %}<title>home</title>{% endblock %}
-{% block body %}
-    <div class="container">
-            <!-- Flash Messages -->
-            {% with messages = get_flashed_messages() %}
-                {% if messages %}
-                    {% for message in messages %}
-                        <div>{{ message }}</div>
-                    {% endfor %}
-                {% endif %}
-            {% endwith %}
-        <div class="page_top">
-            {% if session.get('role')==1 %}<a href="{{url_for('addstudent')}}" class="add"><button >Add Student</button></a>{% endif %}
-            {% if session.get('role')==1 %}<a href="{{url_for('addteacher')}}" class="add"><button >Add teacher</button></a>{% endif %}
-            <h1 class="page-title">Home</h1>
-        </div>
-        <p>Welcome to the home page!</p>
-        <table class="table">
-            <tr>
-                <th class="first">ROLL.NO</th>
-                <th>First name</th>
-                <th class="last">View/Delete</th>
-            </tr>
-            {% if session['class']=='all' %}
-                {% for student in students %}
-                    <tr>
-                        <td>{{student['roll_no']}}</td>
-                        <td>{{student['s_name']}}</td>
-                        <td><a href="{{url_for('students', rollno=student['roll_no'])}}"><button >{{url_for('students', rollno=student['roll_no'])}}</button></a>
-                            <div>
-                            <!-- {% if session.get['role']==3 %}<a href="{{url_for('delstudent', rollno=student['roll_no'])}}"><button >Delete</button></a>{% endif %} -->
-                        </td>
-                    </tr>
-                {% endfor %}
-            {% else %}
-                {% for student in students %}
-                    {% if student['class']==session['class'] %}
-                        <tr>
-                            <td>{{student['roll_no']}}</td>
-                            <td>{{student['s_name']}}</td>
-                            <td><a href="{{url_for('students', rollno=student['roll_no'])}}"><button >View</button></a>
-                                <div>
-                                {% if session.get['role']==1 %}<a href="{{url_for('delstudent', rollno=student['roll_no'])}}"><button >Delete</button></a>{% endif %}
-                            </td>
-                        </tr>
-                    {% endif %}
-                {% endfor %}
-            {% endif %}
-        </table> 
-        {% if session.get('role')==1 %}
-            <table class="table">
-                <tr>
-                    <th class="first">Teacher.NO</th>
-                    <th>Name</th>
-                    <th class="last">Class</th>
-                </tr>
-                {% for teacher in teachers %}
-                    {%if teacher['t_name']!='admin'%}
-                        <tr>
-                            <td>{{teacher['t_no']}}</td>
-                            <td>{{teacher['t_name']}}</td>
-                            <td>{{teacher['class']}}</td>
-                        </tr>
-                    {% endif %}
-                {% endfor %}
-            </table>
-        {% endif %}
-    </div>     
->>>>>>> 192c9775f552fd7645e842edfb371c0ae508b5cc
 {% endblock %}

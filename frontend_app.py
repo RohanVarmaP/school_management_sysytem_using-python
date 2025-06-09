@@ -104,7 +104,7 @@ def login():
                 print("admin")
                 session['t_no']=user['t_no']
                 flash("Login successful!")
-                return redirect(url_for('home'))
+                return redirect(url_for('dashboard'))
         else:
             flash(res.json().get('message'))
             return redirect(url_for('login'))
@@ -174,33 +174,17 @@ def home():
 @checklogin
 @check_admin
 def dashboard():
-    db=get_sql_connection()
-    cursor= db.cursor()
-    cursor.execute("SELECT COUNT(*) FROM student_info;")
-    total=cursor.fetchone()[0]
-    cursor.execute("SELECT gender,COUNT(*) FROM student_info GROUP BY gender;")
-    gender=dict(cursor.fetchall())
-    cursor.execute("SELECT fee,COUNT(*) FROM student_info GROUP BY fee;")
-    fee=dict(cursor.fetchall())
-    cursor.execute("SELECT s.sub_name,AVG(m.marks) FROM marks_info m JOIN sub_info s GROUP BY s.sub_name;")
-    avgmarks=dict(cursor.fetchall())
-    cursor.execute("SELECT class,COUNT(*) FROM student_info GROUP BY class;")
-    stuinclass=dict(cursor.fetchall())
-    cursor.execute("SELECT class,COUNT(*) FROM student_info WHERE gender='male' GROUP BY class;")
-    male=dict(cursor.fetchall())
-    cursor.execute("SELECT class,COUNT(*) FROM student_info WHERE gender='female' GROUP BY class;")
-    female=dict(cursor.fetchall())
-    
-    data={"total":total,
-          "gender": gender,
-          "fee": fee,
-          "avgmarks": avgmarks,
-          "stuinclass": stuinclass,
-          "male": male,
-          "female": female
-          }
+    print("helloooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo",session.get('role'))
+    res = requests.get(f"http://localhost:5000/api/dashboard/{session.get('role')}/")
+    print(res)
+    if res.status_code!=200:
+        flash(res.json().get('message'))
+        return redirect(url_for('home'))
+    flash(res.json().get('message'))
+    data=res.json().get("info")
     print(data)
     return render_template('dashboard.html',data=data)
+    
 
 @app.route('/addstudent', methods=["POST","GET"])
 @checklogin
