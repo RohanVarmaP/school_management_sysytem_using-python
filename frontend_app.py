@@ -275,7 +275,7 @@ def deletestudent(roll_no):
         flash(res.json().get('message'))
         return redirect(url_for('home'))
     else:
-        flash(res.json().get('meassage'))
+        flash(res.json().get('message'))
         return redirect(url_for('home'))
 
 @app.route('/logout')
