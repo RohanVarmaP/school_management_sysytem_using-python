@@ -12,14 +12,12 @@
         <div class="tab">
             <p>Class</p>
             <select id="class" name="class" required>
-                <option value="">Select class</option>
-                <option value="9A">9A</option>
-                <option value="10A">10A</option>
-                <option value="10B">10B</option>
-                <option value="11A">11A</option>
-                <option value="11B">11B</option>
-                <option value="12A">12A</option>
-                <option value="12B">12B</option>
+                <option value="">Select Subject</option>
+                {% for class1 in classes %}
+                    {% if class1!="all" %}
+                        <option value="{{class1}}">{{class1}}</option>
+                    {% endif %}
+                {% endfor %}
             </select>
         </div>
         <div class="tab">

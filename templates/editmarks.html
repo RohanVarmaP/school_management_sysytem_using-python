@@ -7,10 +7,9 @@
             <p>subject</p>
             <select id="subject", name="subject" required>
                 <option value="">Select Subject</option>
-                <option value="2">Maths</option>
-                <option value="1">Science</option>
-                <option value="3">Telugu</option>
-                <option value="4">Hindi</option>
+                {% for subject in subjects %}
+                    <option value="{{subject[0]}}">{{subject[1]}}</option>
+                {% endfor %}
             </select>
         </div>
         <div class="tab">

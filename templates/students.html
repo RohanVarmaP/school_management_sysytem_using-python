@@ -3,7 +3,10 @@
 {% block body %}
     <div class="container">
         <div class="page_top">
-            {% if session.get('role')==2 %}<a href="{{url_for('addmarks',roll_no=students['student']['roll_no'])}}" class="add"><button >Add marks</button></a>{% endif %}
+            {% if session.get('role')==2 %}
+                {% if session.get('mark')==False %}<a href="{{url_for('addmarks',roll_no=students['student']['roll_no'])}}" class="add"><button >Add marks</button></a>{% endif %}
+                <a href="{{url_for('editmarks',roll_no=students['student']['roll_no'])}}" class="add"><button >Edit marks</button></a>
+            {% endif %}
             <h1 class="page-title">Student Information</h1>
         </div>
         <!-- Flash Messages -->
@@ -41,18 +44,12 @@
                     <th class="first">subject</th>
                     <th>Marks</th>
                     <th class="last">Grade</th>
-                    {% if session.get('role')==2 %}
-                            <th>Edit</th>
-                        {% endif %}
                 </tr>
                 {% for mark in students['marks'] %}
                     <tr>
                         <td>{{mark['subject']}}</td>
                         <td>{{mark['marks']}}</td>
                         <td>{{mark['grade']}}</td>
-                        {% if session.get('role')==2 %}
-                            <td><a href="{{url_for('editmarks', roll_no=students['student']['roll_no'])}}"><button>Edit</button></a></td>
-                        {% endif %}
                     </tr>
                 {% endfor %}
             </table> 

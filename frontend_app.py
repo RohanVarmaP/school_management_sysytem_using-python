@@ -1,8 +1,15 @@
-from flask import Flask, request, jsonify, render_template, redirect, url_for, flash,session
+from urllib.parse import quote_plus
+from flask import Flask, request, render_template, redirect, url_for, flash,session
 from functools import wraps
+from flask_sqlalchemy import SQLAlchemy
 import requests
+from backend_app import Subinfo,Marksinfo,Teacherinfo
 app= Flask(__name__)
 app.secret_key="my_secret_key_here"
+password=quote_plus("Rohan@2003")
+app.config['SQLALCHEMY_DATABASE_URI']=f'mysql+pymysql://root:{password}@localhost/rohandb1'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS']=False
+db=SQLAlchemy(app)
 
 def check_not_stu(func):
     @wraps(func)
@@ -99,7 +106,7 @@ def login():
                 print("Teacher")
                 session['t_no']=user['t_no']
                 flash("Login successful!")
-                return redirect(url_for('home'))
+                return redirect(url_for('teacherslist'))
             else:
                 print("admin")
                 session['t_no']=user['t_no']
@@ -120,6 +127,12 @@ def students(roll_no=None):
             res = requests.get(f"http://localhost:5000/api/students/{session.get('role')}/{session.get('roll_no')}/{roll_no}")
             if res.status_code==200:
                 print("with rollno student                       ",res.json().get('info'))
+                subjects=db.session.query(Subinfo.sub_name).all()
+                stu_sub=db.session.query(Subinfo.sub_name).outerjoin(Marksinfo,Marksinfo.sub_no==Subinfo.sub_no).filter(Marksinfo.roll_no==roll_no).all()
+                if subjects==stu_sub:
+                    session['mark']=True
+                else:
+                    session['mark']=False
                 return render_template('students.html', students=res.json().get('info'))
             else:
                 flash("You are not authorized to view that page.")
@@ -129,6 +142,12 @@ def students(roll_no=None):
             res = requests.get(f"http://localhost:5000/api/students/{session.get('role')}/{session.get('roll_no')}/{roll_no}")
             if res.status_code==200:
                 print("without rollno student                       ",res.json().get('info'))
+                subjects=db.session.query(Subinfo.sub_name).all()
+                stu_sub=db.session.query(Subinfo.sub_name).outerjoin(Marksinfo,Marksinfo.sub_no==Subinfo.sub_no).filter(Marksinfo.roll_no==roll_no).all()
+                if subjects==stu_sub:
+                    session['mark']=True
+                else:
+                    session['mark']=False
                 return render_template('students.html', students=res.json().get('info'))
             else:
                 flash("You are not authorized to view that page.")
@@ -140,34 +159,58 @@ def students(roll_no=None):
             res = requests.get(f"http://localhost:5000/api/students/{session.get('role')}/{session.get('t_no')}/{roll_no}")
             if res.status_code==200:
                 print("with rollno not student                       ",res.json().get('info'))
+                subjects=db.session.query(Subinfo.sub_name).all()
+                stu_sub=db.session.query(Subinfo.sub_name).outerjoin(Marksinfo,Marksinfo.sub_no==Subinfo.sub_no).filter(Marksinfo.roll_no==roll_no).all()
+                if subjects==stu_sub:
+                    session['mark']=True
+                else:
+                    session['mark']=False
                 session['t_rollno']=roll_no
+                print("session marks is                                   ",session.get('mark'))
                 return render_template('students.html', students=res.json().get('info'))
             else:
                 flash("You are not authorized to view that page(student with roll_no).")
-                return redirect(url_for('home'))
+                return redirect(url_for('teacherslist'))
         else:
             print("not student,without roll_no",session['t_rollno'])
             roll_no=session['t_rollno']
             res = requests.get(f"http://localhost:5000/api/students/{session.get('role')}/{session.get('t_no')}/{roll_no}")
             if res.status_code==200:
                 print("without rollno not student                       ",res.json().get('info'))
+                subjects=db.session.query(Subinfo.sub_name).all()
+                stu_sub=db.session.query(Subinfo.sub_name).outerjoin(Marksinfo,Marksinfo.sub_no==Subinfo.sub_no).filter(Marksinfo.roll_no==roll_no).all()
+                if subjects==stu_sub:
+                    session['mark']=True
+                else:
+                    session['mark']=False
                 session['t_rollno']=roll_no
                 return render_template('students.html', students=res.json().get('info'))
             else:
                 flash("You are not authorized to view that page(student without roll_no).")
-                return redirect(url_for('home'))
+                return redirect(url_for('teacherslist'))
 
-@app.route('/home')
+@app.route('/studentslist')
 @checklogin
 @check_not_stu
-def home():
+def studentslist():
     res1 = requests.get(f"http://localhost:5000/api/students/{session.get('role')}/{session.get('t_no')}/")
-    res2 = requests.get(f"http://localhost:5000/api/teachers/{session.get('role')}/{session.get('t_no')}/")
-    if res1.status_code==200 and res2.status_code==200:
+    if res1.status_code==200:
         flash("You are authorized to view that page.")
         print("students          ",res1.json().get('students'))
+        return render_template('students_list.html', students=res1.json().get('students'))
+    else:
+        flash("You are not authorized to view that page.")
+        return redirect(url_for('logout'))
+
+@app.route('/teacherslist')
+@checklogin
+@check_not_stu
+def teacherslist():
+    res2 = requests.get(f"http://localhost:5000/api/teachers/{session.get('role')}/{session.get('t_no')}/")
+    if res2.status_code==200:
+        flash("You are authorized to view that page.")
         print("teachers          ",res2.json().get('info'))
-        return render_template('home.html', students=res1.json().get('students'),teachers=res2.json().get('info'))
+        return render_template('teachers_list.html', teachers=res2.json().get('info'))
     else:
         flash("You are not authorized to view that page.")
         return redirect(url_for('logout'))
@@ -181,7 +224,7 @@ def dashboard():
     print(res)
     if res.status_code!=200:
         flash(res.json().get('message'))
-        return redirect(url_for('home'))
+        return redirect(url_for('teaherslist'))
     flash(res.json().get('message'))
     data=res.json().get("info")
     print(data)
@@ -207,10 +250,13 @@ def addstudent():
         res = requests.post(f"http://localhost:5000/api/adduser/{session.get('role')}/",json=data)
         if res.status_code!=200:
             flash(res.json().get('message'))
-            return redirect(url_for('home'))
+            return redirect(url_for('studentslist'))
         flash(res.json().get('message'))
-        return redirect(url_for('home'))
-    return render_template("addstudent.html")
+        return redirect(url_for('studentslist'))
+    tch_class = db.session.query(Teacherinfo.t_class).all()
+    tch_class_flat = [cls[0] for cls in tch_class]
+    print("stu subs are :::::::::::::::::::::::::::::::::::::::",tch_class_flat)
+    return render_template("addstudent.html",classes=tch_class_flat)
 
 @app.route('/addmarks/<int:roll_no>',methods=["POST","GET"])
 @checklogin
@@ -229,7 +275,12 @@ def addmarks(roll_no):
             return redirect(url_for('students'))
         flash(res.json().get('message'))
         return redirect(url_for('students'))
-    return render_template("addmarks.html")
+    stu_sub = db.session.query(Subinfo.sub_name).outerjoin(Marksinfo, Marksinfo.sub_no == Subinfo.sub_no).filter(Marksinfo.roll_no == roll_no).all()
+    stu_sub_names = [sub[0] for sub in stu_sub]
+    subs = db.session.query(Subinfo.sub_no,Subinfo.sub_name).filter(Subinfo.sub_name.notin_(stu_sub_names)).all()
+    print("stu subs are :::::::::::::::::::::::::::::::::::::::",stu_sub_names)
+    print("subs are :::::::::::::::::::::::::::::::::::::::",subs)
+    return render_template("addmarks.html", subjects=subs)
 
 @app.route('/addteacher',methods=["POST","GET"])
 @checklogin
@@ -247,9 +298,9 @@ def addteacher():
             res = requests.post(f"http://localhost:5000/api/adduser/{session.get('role')}/",json=data)
             if res.status_code!=200:
                 flash(res.json().get('message'))
-                return redirect(url_for('home'))
+                return redirect(url_for('teacherslist'))
             flash(res.json().get('message'))
-            return redirect(url_for('home'))
+            return redirect(url_for('teacherslist'))
         return render_template("addteacher.html")
 
 @app.route('/editstudent/<int:roll_no>',methods=["POST","GET","PUT"])
@@ -272,10 +323,13 @@ def editstudent(roll_no):
         res=requests.put(f"http://localhost:5000/api/editstudent/{session.get('role')}/{roll_no}/",json=data)
         if res.status_code!=200:
             flash(res.json().get('message'))
-            return redirect(url_for('home'))
+            return redirect(url_for('studentslist'))
         flash(res.json().get('message'))
-        return redirect(url_for('home'))
-    return render_template("editstudent.html")
+        return redirect(url_for('studentslist'))
+    tch_class = db.session.query(Teacherinfo.t_class).all()
+    tch_class_flat = [cls[0] for cls in tch_class]
+    print("stu subs are :::::::::::::::::::::::::::::::::::::::",tch_class_flat)
+    return render_template("editstudent.html",classes=tch_class_flat)
 
 @app.route('/editmarks/<int:roll_no>/',methods=["POST","GET"])
 @checklogin
@@ -293,7 +347,9 @@ def editmarks(roll_no):
             return redirect(url_for('students'))
         flash(res.json().get('message'))
         return redirect(url_for('students'))
-    return render_template("editmarks.html")
+    stu_sub = db.session.query(Subinfo.sub_no,Subinfo.sub_name).outerjoin(Marksinfo, Marksinfo.sub_no == Subinfo.sub_no).filter(Marksinfo.roll_no == roll_no).all()
+    print("stu subs are :::::::::::::::::::::::::::::::::::::::",stu_sub)
+    return render_template("editmarks.html", subjects=stu_sub)
 
 
 @app.route('/deletestudent/<int:roll_no>')
@@ -303,10 +359,10 @@ def deletestudent(roll_no):
     res=requests.delete(f"http://127.0.0.1:5000/api/deletestudent/{session.get('role')}/{roll_no}/")
     if res.status_code==200:
         flash(res.json().get('message'))
-        return redirect(url_for('home'))
+        return redirect(url_for('studentslist'))
     else:
         flash(res.json().get('message'))
-        return redirect(url_for('home'))
+        return redirect(url_for('studentslist'))
 
 @app.route('/logout')
 def logout():

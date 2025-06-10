@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block head %}<title>Students List</title>{% endblock %}
+{% block body %}
+    <div class="container">
+            <!-- Flash Messages -->
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                    {% for message in messages %}
+                        <div>{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+        <div class="page_top">
+            {% if session.get('role')==1 %}<a href="{{url_for('addstudent')}}" class="add"><button >Add Student</button></a>{% endif %}
+            <h1 class="page-title">Students List</h1>
+        </div>
+        <p>Welcome to the Students page!</p>
+        <table class="table">
+            <tr>
+                <th class="first">ROLL.NO</th>
+                <th>First name</th>
+                <th class="last">View/Delete</th>
+            </tr>
+            {% for student in students %}
+                <tr>
+                    <td>{{student['roll_no']}}</td>
+                    <td>{{student['s_name']}}</td>
+                    <td>
+                        <div class="action-buttons">
+                            <a href="{{url_for('students', roll_no=student['roll_no'])}}"><button>View</button></a>
+                            {% if session.get('role')==1 %}
+                                <a href="{{url_for('editstudent', roll_no=student['roll_no'])}}"><button>Edit</button></a>
+                                <a href="{{url_for('deletestudent', roll_no=student['roll_no'])}}"><button>Delete</button></a>
+                            {% endif %}
+                        </div>
+                    </td>
+                </tr>
+            {% endfor %}
+        </table> 
+    </div>     
+{% endblock %}
