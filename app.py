@@ -3,7 +3,7 @@ from flask import Flask, request, render_template, redirect, url_for, flash,sess
 from functools import wraps
 from flask_sqlalchemy import SQLAlchemy
 import requests
-from backend_app import Subinfo,Marksinfo,Teacherinfo
+from backend_api import Subinfo,Marksinfo,Teacherinfo
 app= Flask(__name__)
 app.secret_key="my_secret_key_here"
 password=quote_plus("Rohan@2003")
