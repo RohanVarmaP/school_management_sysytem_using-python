@@ -117,6 +117,47 @@ def login():
             return redirect(url_for('login'))
     return render_template('login.html')
 
+@app.route('/dashboard')
+@checklogin
+@check_admin
+def dashboard():
+    print("helloooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo",session.get('role'))
+    res = requests.get(f"http://localhost:5000/api/dashboard/{session.get('role')}/")
+    print(res)
+    if res.status_code!=200:
+        flash(res.json().get('message'))
+        return redirect(url_for('teaherslist'))
+    flash(res.json().get('message'))
+    data=res.json().get("info")
+    print(data)
+    return render_template('dashboard.html',data=data)
+
+@app.route('/studentslist')
+@checklogin
+@check_not_stu
+def studentslist():
+    res1 = requests.get(f"http://localhost:5000/api/students/{session.get('role')}/{session.get('t_no')}/")
+    if res1.status_code==200:
+        flash("You are authorized to view that page.")
+        print("students          ",res1.json().get('students'))
+        return render_template('students_list.html', students=res1.json().get('students'))
+    else:
+        flash("You are not authorized to view that page.")
+        return redirect(url_for('logout'))
+
+@app.route('/teacherslist')
+@checklogin
+@check_not_stu
+def teacherslist():
+    res2 = requests.get(f"http://localhost:5000/api/teachers/{session.get('role')}/{session.get('t_no')}/")
+    if res2.status_code==200:
+        flash("You are authorized to view that page.")
+        print("teachers          ",res2.json().get('info'))
+        return render_template('teachers_list.html', teachers=res2.json().get('info'))
+    else:
+        flash("You are not authorized to view that page.")
+        return redirect(url_for('logout'))
+
 @app.route('/students/', methods=['GET'])
 @app.route('/students/<int:roll_no>', methods=['GET'])
 @checklogin
@@ -189,48 +230,6 @@ def students(roll_no=None):
                 flash("You are not authorized to view that page(student without roll_no).")
                 return redirect(url_for('teacherslist'))
 
-@app.route('/studentslist')
-@checklogin
-@check_not_stu
-def studentslist():
-    res1 = requests.get(f"http://localhost:5000/api/students/{session.get('role')}/{session.get('t_no')}/")
-    if res1.status_code==200:
-        flash("You are authorized to view that page.")
-        print("students          ",res1.json().get('students'))
-        return render_template('students_list.html', students=res1.json().get('students'))
-    else:
-        flash("You are not authorized to view that page.")
-        return redirect(url_for('logout'))
-
-@app.route('/teacherslist')
-@checklogin
-@check_not_stu
-def teacherslist():
-    res2 = requests.get(f"http://localhost:5000/api/teachers/{session.get('role')}/{session.get('t_no')}/")
-    if res2.status_code==200:
-        flash("You are authorized to view that page.")
-        print("teachers          ",res2.json().get('info'))
-        return render_template('teachers_list.html', teachers=res2.json().get('info'))
-    else:
-        flash("You are not authorized to view that page.")
-        return redirect(url_for('logout'))
-
-@app.route('/dashboard')
-@checklogin
-@check_admin
-def dashboard():
-    print("helloooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo",session.get('role'))
-    res = requests.get(f"http://localhost:5000/api/dashboard/{session.get('role')}/")
-    print(res)
-    if res.status_code!=200:
-        flash(res.json().get('message'))
-        return redirect(url_for('teaherslist'))
-    flash(res.json().get('message'))
-    data=res.json().get("info")
-    print(data)
-    return render_template('dashboard.html',data=data)
-    
-
 @app.route('/addstudent', methods=["POST","GET"])
 @checklogin
 @check_admin
@@ -258,6 +257,27 @@ def addstudent():
     print("stu subs are :::::::::::::::::::::::::::::::::::::::",tch_class_flat)
     return render_template("addstudent.html",classes=tch_class_flat)
 
+@app.route('/addteacher',methods=["POST","GET"])
+@checklogin
+@check_admin
+def addteacher():
+        if request.method=="POST":
+            data={
+                "role":2,
+                "username": request.form["username"],
+                "password": request.form["password"],
+                "teacher_name" : request.form["name"],
+                "class" : request.form["class"]
+            }
+            print("adding teacher!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!",data)
+            res = requests.post(f"http://localhost:5000/api/adduser/{session.get('role')}/",json=data)
+            if res.status_code!=200:
+                flash(res.json().get('message'))
+                return redirect(url_for('teacherslist'))
+            flash(res.json().get('message'))
+            return redirect(url_for('teacherslist'))
+        return render_template("addteacher.html")
+
 @app.route('/addmarks/<int:roll_no>',methods=["POST","GET"])
 @checklogin
 @check_teacher
@@ -281,27 +301,6 @@ def addmarks(roll_no):
     print("stu subs are :::::::::::::::::::::::::::::::::::::::",stu_sub_names)
     print("subs are :::::::::::::::::::::::::::::::::::::::",subs)
     return render_template("addmarks.html", subjects=subs)
-
-@app.route('/addteacher',methods=["POST","GET"])
-@checklogin
-@check_admin
-def addteacher():
-        if request.method=="POST":
-            data={
-                "role":2,
-                "username": request.form["username"],
-                "password": request.form["password"],
-                "teacher_name" : request.form["name"],
-                "class" : request.form["class"]
-            }
-            print("adding teacher!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!",data)
-            res = requests.post(f"http://localhost:5000/api/adduser/{session.get('role')}/",json=data)
-            if res.status_code!=200:
-                flash(res.json().get('message'))
-                return redirect(url_for('teacherslist'))
-            flash(res.json().get('message'))
-            return redirect(url_for('teacherslist'))
-        return render_template("addteacher.html")
 
 @app.route('/editstudent/<int:roll_no>',methods=["POST","GET","PUT"])
 @checklogin
