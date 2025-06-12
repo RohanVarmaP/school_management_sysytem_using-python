@@ -334,3 +334,51 @@ def test_logout(test_admin):
     response = test_admin.get('/logout', follow_redirects=False)
     assert response.status_code == 302
     assert '/login' in response.headers['Location']
+
+@patch('app.requests.post')
+def test_add_student_fail(mock_post, test_admin):
+    """
+    Test adding a student fails (e.g., API returns error).
+    Should redirect back to /addstudent or show an error.
+    """
+    # Simulate API failure (e.g., validation error)
+    mock_post.return_value.status_code = 400
+    mock_post.return_value.json.return_value = {'message': 'Student could not be added'}
+
+    response = test_admin.post('/addstudent', data={
+        "username": "",
+        "password": "test_password",
+        "name": "test_user",
+        "class": "11A",
+        "age": 18,
+        "fee": "paid",
+        "gender": "male"
+    }, follow_redirects=False)
+
+    # Should redirect back to /addstudent or stay on the page
+    assert response.status_code == 302
+    assert '/addstudent' in response.headers['Location']
+
+@patch('app.requests.post')
+def test_add_teacher_fail(mock_post, test_admin):
+    """
+    Test adding a teacher fails (e.g., API returns error).
+    Should redirect back to /addteacher or show an error.
+    """
+    # Simulate API failure (e.g., validation error)
+    mock_post.return_value.status_code = 400
+    mock_post.return_value.json.return_value = {'message': 'Teacher could not be added'}
+
+    response = test_admin.post('/addteacher', data={
+        "username": "test@teacher.com",
+        "password": "test_password",
+        "name": "test_teacher",
+        "class": "11A"
+    }, follow_redirects=False)
+
+    # Should redirect back to /addteacher or stay on the page
+    assert response.status_code == 302
+    assert '/addteacher' in response.headers['Location']
+
+
+    

@@ -289,12 +289,12 @@ def addstudent():
             app.logger.info(f"Add student API returned status: {res.status_code}")
         except requests.exceptions.RequestException as e:
             app.logger.error(f"Failed to add student: {e}")
-            flash("Error connecting to student registration service.")
-            return redirect(url_for('studentslist'))
+            flash("error connecting to student registration service.")
+            return redirect(url_for('addstudent'))
         if res.status_code!=200:
             app.logger.error(f"Failed to add student: {res.json().get('message')}")
             flash(res.json().get('message'))
-            return redirect(url_for('studentslist'))
+            return redirect(url_for('addstudent'))
         flash(res.json().get('message'))
         app.logger.info(f"User '{session.get('user')}' with role '{session.get('role')}' is has added a student: {request.form["name"]}")
         return redirect(url_for('studentslist'))
@@ -322,10 +322,12 @@ def addteacher():
             app.logger.info(f"Add teacher API returned status: {res.status_code}")
         except requests.exceptions.RequestException as e:
             app.logger.error(f"Failed to add teacher: {e}")
+            flash(res.json().get('message'))
+            return redirect(url_for('addteacher'))
         if res.status_code!=200:
             app.logger.error(f"Failed to add teacher: {res.json().get('message')}")
             flash(res.json().get('message'))
-            return redirect(url_for('teacherslist'))
+            return redirect(url_for('addteacher'))
         flash(res.json().get('message'))
         app.logger.info(f"User '{session.get('user')}' with role '{session.get('role')}' is has added a teacher: {request.form["name"]}")
         return redirect(url_for('teacherslist'))
