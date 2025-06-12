@@ -30,35 +30,35 @@ api=Api(app)
 # SQLAlchemy models
 class Subinfo(db.Model):
     __tablename__='sub_info'
-    sub_no=db.Column(db.Integer, primary_key=True)
-    sub_name=db.Column(db.String(100))
+    sub_no=db.Column(db.Integer, primary_key=True, nullable=False)
+    sub_name=db.Column(db.String(100), nullable=False)
     
     def __repr__(self):
         return f"subject(no={self.sub_no},name={self.sub_name})"
     
 class Roleinfo(db.Model):
     __tablename__='roles_info'
-    role_no=db.Column(db.Integer ,primary_key=True)
-    role_name=db.Column(db.String(100))
+    role_no=db.Column(db.Integer ,primary_key=True, nullable=False)
+    role_name=db.Column(db.String(100), nullable=False)
 
     def __repr__(self):
         return f"role(no={self.role_no},name={self.role_name})"
     
 class Userinfo(db.Model):
     __tablename__='user_info'
-    username=db.Column(db.String(100), primary_key=True)
-    passwords=db.Column(db.String(100))
-    role_no=db.Column(db.Integer, db.ForeignKey('roles_info.role_no', ondelete='CASCADE'))
+    username=db.Column(db.String(100), primary_key=True, nullable=False)
+    passwords=db.Column(db.String(100), nullable=False)
+    role_no=db.Column(db.Integer, db.ForeignKey('roles_info.role_no', ondelete='CASCADE'), nullable=False)
 
     def __repr__(self):
         return f"user(name:{self.username},password:{self.passwords},Role_no:{self.role_no})"
 
 class Teacherinfo(db.Model):
     __tablename__="teacher_info"
-    t_no=db.Column(db.Integer, primary_key=True)
-    t_name=db.Column(db.String(100))
-    t_class=db.Column('class',db.String(100),unique=True)
-    username=db.Column(db.String(100), db.ForeignKey("user_info.username", ondelete='CASCADE'))
+    t_no=db.Column(db.Integer, primary_key=True, nullable=False)
+    t_name=db.Column(db.String(100), nullable=False)
+    t_class=db.Column('class',db.String(100),unique=True, nullable=False)
+    username=db.Column(db.String(100), db.ForeignKey("user_info.username", ondelete='CASCADE'), nullable=False)
 
     user= db.relationship('Userinfo', backref=db.backref('teacher', uselist=False, cascade='all, delete'))
 
@@ -67,13 +67,13 @@ class Teacherinfo(db.Model):
 
 class Studentinfo(db.Model):
     __tablename__='student_info'
-    roll_no=db.Column(db.Integer,primary_key=True)
-    s_name=db.Column(db.String(100))
-    s_class=db.Column('class',db.String(100),db.ForeignKey('teacher_info.class',ondelete='CASCADE'))
-    username=db.Column(db.String(100),db.ForeignKey('user_info.username',ondelete='CASCADE'))
-    s_age=db.Column(db.Integer)
-    fee=db.Column(db.String(100))
-    gender=db.Column(db.String(100))
+    roll_no=db.Column(db.Integer,primary_key=True, nullable=False)
+    s_name=db.Column(db.String(100), nullable=False)
+    s_class=db.Column('class',db.String(100),db.ForeignKey('teacher_info.class',ondelete='CASCADE'), nullable=False)
+    username=db.Column(db.String(100),db.ForeignKey('user_info.username',ondelete='CASCADE'), nullable=False)
+    s_age=db.Column(db.Integer, nullable=False)
+    fee=db.Column(db.String(100), nullable=False)
+    gender=db.Column(db.String(100), nullable=False)
 
     user=db.relationship('Userinfo', backref=db.backref('student',uselist=False, cascade='all, delete'))
     teacher_class=db.relationship('Teacherinfo',backref=db.backref('students', cascade="all,delete"), primaryjoin=foreign(s_class) == Teacherinfo.t_class)
@@ -84,9 +84,9 @@ class Studentinfo(db.Model):
 class Marksinfo(db.Model):
     __tablename__='marks_info'
     id=db.Column(db.Integer,primary_key=True)
-    roll_no=db.Column(db.Integer,db.ForeignKey('student_info.roll_no',ondelete="CASCADE"))
-    sub_no=db.Column(db.Integer,db.ForeignKey('sub_info.sub_no',ondelete="CASCADE"))
-    marks=db.Column(db.Integer)
+    roll_no=db.Column(db.Integer,db.ForeignKey('student_info.roll_no',ondelete="CASCADE"), nullable=False)
+    sub_no=db.Column(db.Integer,db.ForeignKey('sub_info.sub_no',ondelete="CASCADE"), nullable=False)
+    marks=db.Column(db.Integer, nullable=False)
     grade=db.Column(db.String(100))
 
     __table_args__ = (
@@ -392,7 +392,7 @@ class adduser(Resource):
                         db.session.commit()
                         return {'message':"Student added"}
                     except Exception as e:
-                        return {'message':f"Enter the correct values for studentthe error is {e}"},502
+                        return {'message':f"Enter the correct values for student. the error: {e}"},502
                 elif(role==2):
                     try:
                         new_teacher=Teacherinfo(
@@ -406,13 +406,13 @@ class adduser(Resource):
                         db.session.commit()
                         return {'message':"Teacher added"}
                     except Exception as e:
-                        return {f'message':"Enter the correct values for Teacher. the error is {e}"},502
+                        return {f'message':"Enter the correct values for Teacher. the error: {e}"},502
                 else:
-                    return {'message':"You can only add Student or Teacher"},502
+                    return {'message':"error: You can only add Student or Teacher"},502
             else:
-                return {'message':"There is no data sent"},502
+                return {'message':"error: There is no data sent"},502
         else:
-            return {'message':"Only an admin can add Users"},402
+            return {'message':"error: Only an admin can add Users"},402
 
 class addmarks(Resource):
     # @checklogin
